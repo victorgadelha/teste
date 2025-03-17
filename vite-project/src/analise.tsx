@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -21,11 +21,21 @@ const AnaliseDadosNordeste = () => {
     totalNordeste: 0,
     percentualNordeste: 0,
   });
-  const [dadosEstados, setDadosEstados] = useState([]);
-  const [dadosTitulacao, setDadosTitulacao] = useState([]);
-  const [dadosAnos, setDadosAnos] = useState([]);
-  const [dadosDependencia, setDadosDependencia] = useState([]);
-  const [dadosGenero, setDadosGenero] = useState([]);
+  const [dadosEstados, setDadosEstados] = useState<
+    { estado: string; quantidade: number; percentual: string }[]
+  >([]);
+  const [dadosTitulacao, setDadosTitulacao] = useState<
+    { nome: string; quantidade: number; percentual: string }[]
+  >([]);
+  const [dadosAnos, setDadosAnos] = useState<
+    { ano: string; quantidade: number }[]
+  >([]);
+  const [dadosDependencia, setDadosDependencia] = useState<
+    { nome: string; quantidade: number; percentual: string }[]
+  >([]);
+  const [dadosGenero, setDadosGenero] = useState<
+    { nome: string; quantidade: number; percentual: string }[]
+  >([]);
 
   const COLORS = [
     "#0088FE",
@@ -59,25 +69,28 @@ const AnaliseDadosNordeste = () => {
         ];
 
         // Filtrar dados apenas da região Nordeste
-        const dadosNordeste = jsonData.filter((row) =>
-          estadosNordeste.includes(row.Estado)
+        const dadosNordeste = jsonData.filter((row: any) =>
+          estadosNordeste.includes((row as any).Estado)
         );
 
         // Dados gerais
         setDadosGerais({
           totalRegistros: jsonData.length,
           totalNordeste: dadosNordeste.length,
-          percentualNordeste: (
-            (dadosNordeste.length / jsonData.length) *
-            100
-          ).toFixed(2),
+          percentualNordeste: parseFloat(
+            ((dadosNordeste.length / jsonData.length) * 100).toFixed(2)
+          ),
         });
 
         // Dados por estado
-        const dadosEstadosTemp = [];
+        const dadosEstadosTemp: {
+          estado: string;
+          quantidade: number;
+          percentual: string;
+        }[] = [];
         estadosNordeste.forEach((estado) => {
           const quantidade = dadosNordeste.filter(
-            (row) => row.Estado === estado
+            (row: any) => (row as any).Estado === estado
           ).length;
           if (quantidade > 0) {
             dadosEstadosTemp.push({
@@ -92,9 +105,9 @@ const AnaliseDadosNordeste = () => {
         setDadosEstados(dadosEstadosTemp);
 
         // Dados por titulação
-        const titulacoes = {};
-        dadosNordeste.forEach((row) => {
-          const titulacao = row["Grau de Titulação"];
+        const titulacoes: { [key: string]: number } = {};
+        dadosNordeste.forEach((row: any) => {
+          const titulacao = (row as any)["Grau de Titulação"];
           titulacoes[titulacao] = (titulacoes[titulacao] || 0) + 1;
         });
 
@@ -108,9 +121,9 @@ const AnaliseDadosNordeste = () => {
         setDadosTitulacao(dadosTitulacaoTemp);
 
         // Dados por ano
-        const anos = {};
-        dadosNordeste.forEach((row) => {
-          const ano = row.Ano.toString();
+        const anos: { [key: string]: number } = {};
+        dadosNordeste.forEach((row: any) => {
+          const ano = (row as any).Ano.toString();
           anos[ano] = (anos[ano] || 0) + 1;
         });
 
@@ -123,9 +136,9 @@ const AnaliseDadosNordeste = () => {
         setDadosAnos(dadosAnosTemp);
 
         // Dados por dependência administrativa
-        const dependencias = {};
+        const dependencias: { [key: string]: number } = {};
         dadosNordeste.forEach((row) => {
-          const dependencia = row["Dependência Administrativa"];
+          const dependencia = (row as any)["Dependência Administrativa"];
           dependencias[dependencia] = (dependencias[dependencia] || 0) + 1;
         });
 
@@ -140,14 +153,14 @@ const AnaliseDadosNordeste = () => {
         setDadosDependencia(dadosDependenciaTemp);
 
         // Dados por gênero
-        const generos = {};
+        const generos: { [key: string]: number } = {};
         dadosNordeste.forEach((row) => {
           const genero =
-            row["Gênero "] === "F"
+            (row as any)["Gênero "] === "F"
               ? "Feminino"
-              : row["Gênero "] === "M"
+              : (row as any)["Gênero "] === "M"
               ? "Masculino"
-              : row["Gênero "];
+              : (row as any)["Gênero "];
           generos[genero] = (generos[genero] || 0) + 1;
         });
 
@@ -238,9 +251,9 @@ const AnaliseDadosNordeste = () => {
                 outerRadius={80}
                 dataKey="quantidade"
                 nameKey="nome"
-                label={({ nome, percentual }) => `${percentual}%`}
+                label={({ percentual }) => `${percentual}%`}
               >
-                {dadosTitulacao.map((entry, index) => (
+                {dadosTitulacao.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
@@ -285,9 +298,9 @@ const AnaliseDadosNordeste = () => {
                 outerRadius={80}
                 dataKey="quantidade"
                 nameKey="nome"
-                label={({ nome, percentual }) => `${percentual}%`}
+                label={({ percentual }) => `${percentual}%`}
               >
-                {dadosDependencia.map((entry, index) => (
+                {dadosDependencia.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
@@ -315,9 +328,9 @@ const AnaliseDadosNordeste = () => {
                 outerRadius={80}
                 dataKey="quantidade"
                 nameKey="nome"
-                label={({ nome, percentual }) => `${percentual}%`}
+                label={({ percentual }) => `${percentual}%`}
               >
-                {dadosGenero.map((entry, index) => (
+                {dadosGenero.map((_entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}

@@ -39,7 +39,7 @@ const AnaliseDadosNordeste = () => {
   useEffect(() => {
     const carregarDados = async () => {
       try {
-        const response = await fetch("/Planilha - Dados BDTD, CAPES.xlsx");
+        const response = await fetch("/Planilha_Dados_BDTD_CAPES.xlsx");
         const arrayBuffer = await response.arrayBuffer();
         const workbook = XLSX.read(arrayBuffer, { cellDates: true });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
